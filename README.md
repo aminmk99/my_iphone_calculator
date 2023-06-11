@@ -1,6 +1,11 @@
 # calculator
 
-A new Flutter project.
+This a simple flutter project which is a calculator and is inspired by iPhone calculator.
+
+Here are some screenshots of my App.
+
+<img src="images/shot1.png" width="400" height="800">
+<img src="images/shot2.png" width="400" height="800">
 
 ## Getting Started
 
