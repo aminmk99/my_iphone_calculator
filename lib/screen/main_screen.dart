@@ -16,8 +16,6 @@ class _MainScreenState extends State<MainScreen> {
   double distantFromBottom = 20.0;
   String output = '0';
 
-  TextEditingController _controller = TextEditingController(text: '0');
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -95,7 +93,7 @@ class _MainScreenState extends State<MainScreen> {
               children: [
                 ZeroButton(action: () => numbersFunc('0'), text: '0'),
                 NumberButtons(action: () => floatFunc('.'), text: '.'),
-                OperatorsButtons(action: ((() => print('='))), text: '='),
+                OperatorsButtons(action: () => calculate(output), text: '='),
               ],
             ),
           ],
@@ -127,5 +125,62 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       output = output + op;
     });
+  }
+
+  num calculate(String input) {
+    List<String> tokens = input.split(RegExp(r'([\+\-×÷])'));
+    List<String> operators =
+        input.replaceAll(RegExp('[^\\+\\-×÷]'), '').split('');
+
+    // Perform multiplication and division first
+    int index = 0;
+    while (operators.contains('×') || operators.contains('÷')) {
+      if (operators[index] == '×') {
+        double result =
+            double.parse(tokens[index]) * double.parse(tokens[index + 1]);
+        tokens.replaceRange(index, index + 2, [result.toString()]);
+        operators.removeAt(index);
+      } else if (operators[index] == '÷') {
+        double result =
+            double.parse(tokens[index]) / double.parse(tokens[index + 1]);
+        tokens.replaceRange(index, index + 2, [result.toString()]);
+        operators.removeAt(index);
+      } else {
+        index += 1;
+      }
+    }
+
+    // Perform addition and subtraction next
+    index = 0;
+    double result = double.parse(tokens[index]);
+    while (operators.isNotEmpty) {
+      String operator = operators[index];
+      double operand = double.parse(tokens[index + 1]);
+      switch (operator) {
+        case '+':
+          result += operand;
+          break;
+        case '−':
+          result -= operand;
+          break;
+        default:
+          throw Exception('Invalid operator: $operator');
+      }
+      operators.removeAt(index);
+      tokens.replaceRange(index, index + 2, [result.toString()]);
+    }
+
+    // Check if the result is an integer
+    if (result % 1 == 0) {
+      setState(() {
+        output = result.toInt().toString();
+      });
+      return result.toInt();
+    } else {
+      setState(() {
+        output = result.toString();
+      });
+      return result;
+    }
   }
 }
