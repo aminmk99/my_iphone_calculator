@@ -18,7 +18,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     //
 
     return Scaffold(
@@ -127,10 +126,27 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  num calculate(String input) {
-    List<String> tokens = input.split(RegExp(r'([\+\-×÷])'));
-    List<String> operators =
-        input.replaceAll(RegExp('[^\\+\\-×÷]'), '').split('');
+  calculate(String input) {
+    input = input.replaceAll('−', '-'); // Replace '−' with '-'
+
+    List<String> tokens = [];
+    List<String> operators = [];
+    String currentToken = '';
+    for (int i = 0; i < input.length; i++) {
+      String char = input[i];
+      if (char == '+' || char == '-' || char == '×' || char == '÷') {
+        if (currentToken.isNotEmpty) {
+          tokens.add(currentToken);
+          currentToken = '';
+        }
+        operators.add(char);
+      } else {
+        currentToken += char;
+      }
+    }
+    if (currentToken.isNotEmpty) {
+      tokens.add(currentToken);
+    }
 
     // Perform multiplication and division first
     int index = 0;
@@ -160,7 +176,7 @@ class _MainScreenState extends State<MainScreen> {
         case '+':
           result += operand;
           break;
-        case '−':
+        case '-':
           result -= operand;
           break;
         default:
@@ -175,12 +191,12 @@ class _MainScreenState extends State<MainScreen> {
       setState(() {
         output = result.toInt().toString();
       });
-      return result.toInt();
+      print(output);
     } else {
       setState(() {
         output = result.toString();
       });
-      return result;
+      print(output);
     }
   }
 }
