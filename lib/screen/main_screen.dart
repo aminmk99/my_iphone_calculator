@@ -63,7 +63,7 @@ class _MainScreenState extends State<MainScreen> {
                 NumberButtons(action: () => numbersFunc('7'), text: '7'),
                 NumberButtons(action: (() => numbersFunc('8')), text: '8'),
                 NumberButtons(action: (() => numbersFunc('9')), text: '9'),
-                OperatorsButtons(action: () => numbersFunc('×'), text: '×'),
+                OperatorsButtons(action: () => operatorFunc('×'), text: '×'),
               ],
             ),
             // Third Row
@@ -73,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
                 NumberButtons(action: () => numbersFunc('4'), text: '4'),
                 NumberButtons(action: () => numbersFunc('5'), text: '5'),
                 NumberButtons(action: () => numbersFunc('6'), text: '6'),
-                OperatorsButtons(action: () => numbersFunc('−'), text: '−'),
+                OperatorsButtons(action: () => operatorFunc('−'), text: '−'),
               ],
             ),
             // 4th Row
@@ -120,10 +120,20 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  operatorFunc(String op) {
+  void operatorFunc(String op) {
+    var temp = output.substring(output.length-1);
     setState(() {
-      output = output + op;
+      if (temp == '+' || temp == '−' || temp == '×' || temp == '÷') {
+        output = replaceLast(output, op);
+      } //
+      else {
+        output += op;
+      }
     });
+  }
+
+  String replaceLast(String original, String replacement) {
+    return original.substring(0, original.length - 1) + replacement;
   }
 
   calculate(String input) {
