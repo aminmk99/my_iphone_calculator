@@ -39,27 +39,21 @@ class _MainScreenState extends State<MainScreen> {
                 // AC button
                 DisplayFormatButtons(
                     action: (() {
-                      setState(() {
-                        output = '0';
-                        isDivisionPressed = false;
-                        isMultiplePressed = false;
-                        isMinusPressed = false;
-                        isPlusPressed = false;
-                        print('AC');
-                      });
+                      displayFormatFunc('AC');
                     }),
                     text: 'AC'),
                 // +/- button
                 DisplayFormatButtons(
-                    action: (() {
-                      setState(() {
-                        output = output + '+/-';
-                        print('+/-');
-                      });
-                    }),
+                    action: () {
+                      displayFormatFunc('+/-');
+                    },
                     text: '+/-'),
                 // % button
-                DisplayFormatButtons(action: ((() => print('%'))), text: '%'),
+                DisplayFormatButtons(
+                    action: (() {
+                      displayFormatFunc('%');
+                    }),
+                    text: '%'),
                 // division button
                 OperatorsButtons(
                     action: () => operatorFunc('÷'),
@@ -88,7 +82,7 @@ class _MainScreenState extends State<MainScreen> {
                 NumberButtons(action: () => numbersFunc('5'), text: '5'),
                 NumberButtons(action: () => numbersFunc('6'), text: '6'),
                 OperatorsButtons(
-                    action: () => operatorFunc('−'),
+                    action: () => operatorFunc('-'),
                     text: '−',
                     isPressed: isMinusPressed),
               ],
@@ -122,6 +116,40 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+
+  displayFormatFunc(String displayFormat) {
+    setState(() {
+      //AC button
+      if (displayFormat == 'AC') {
+        setState(() {
+          output = '0';
+          isDivisionPressed = false;
+          isMultiplePressed = false;
+          isMinusPressed = false;
+          isPlusPressed = false;
+          print('AC');
+        });
+      }
+      //% button
+      if (displayFormat == '%') {
+        // Check if the string consists of digits only
+        if (RegExp(r'^\d+$').hasMatch(output)) {
+          output = (double.parse(output) / 100).toString();
+        }
+      }
+      // +/- button
+      if (displayFormat == '+/-') {
+        // Check if the string consists of digits only
+        if (RegExp(r'^\d+$').hasMatch(output) || output.startsWith('−')) {
+          if (!output.startsWith('-') && output != '0') {
+            output = '-' + output;
+          } else if (output.startsWith('-')) {
+            output = output.replaceAll('-', '');
+          }
+        }
+      }
+    });
   }
 
   numbersFunc(String num) {
@@ -163,7 +191,7 @@ class _MainScreenState extends State<MainScreen> {
           isMinusPressed = false;
           isPlusPressed = false;
           break;
-        case '−':
+        case '-':
           isMinusPressed = true;
           isDivisionPressed = false;
           isMultiplePressed = false;
@@ -176,7 +204,7 @@ class _MainScreenState extends State<MainScreen> {
           isMultiplePressed = false;
           break;
       }
-      if (temp == '+' || temp == '−' || temp == '×' || temp == '÷') {
+      if (temp == '+' || temp == '-' || temp == '×' || temp == '÷') {
         output = replaceLast(output, op);
       } //
       else {
@@ -189,12 +217,11 @@ class _MainScreenState extends State<MainScreen> {
     return original.substring(0, original.length - 1) + replacement;
   }
 
-  calculate(String input) {
-    input = input.replaceAll('−', '-'); // Replace '−' with '-'
-
+  void calculate(String input) {
     List<String> tokens = [];
     List<String> operators = [];
     String currentToken = '';
+    bool isUnaryMinus = true; // Assume that the first token is a unary minus
     for (int i = 0; i < input.length; i++) {
       String char = input[i];
       if (char == '+' || char == '-' || char == '×' || char == '÷') {
@@ -202,9 +229,16 @@ class _MainScreenState extends State<MainScreen> {
           tokens.add(currentToken);
           currentToken = '';
         }
-        operators.add(char);
+        if (char == '-' && isUnaryMinus) {
+          // Handle unary minus
+          currentToken += '-';
+        } else {
+          isUnaryMinus = false;
+          operators.add(char);
+        }
       } else {
         currentToken += char;
+        isUnaryMinus = false;
       }
     }
     if (currentToken.isNotEmpty) {
@@ -254,7 +288,6 @@ class _MainScreenState extends State<MainScreen> {
       setState(() {
         output = result.toInt().toString();
       });
-      print(output);
     } else {
       setState(() {
         output = result
@@ -262,7 +295,7 @@ class _MainScreenState extends State<MainScreen> {
             .replaceAll(RegExp(r'0*$'), '')
             .replaceAll(RegExp(r'\.$'), '');
       });
-      print(output);
     }
+    print(output);
   }
 }
