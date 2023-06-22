@@ -134,7 +134,7 @@ class _MainScreenState extends State<MainScreen> {
       //% button
       if (displayFormat == '%') {
         // Check if the string consists of digits only
-        if (RegExp(r'^\d+(\.\d+)?$').hasMatch(output)) {
+        if (RegExp(r'^\d+(\.\d+)?$').hasMatch(output) || output.startsWith('-')) {
           output = (double.parse(output) / 100).toString();
         }
       }
