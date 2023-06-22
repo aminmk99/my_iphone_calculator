@@ -15,10 +15,14 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   double distantFromBottom = 20.0;
   String output = '0';
+  bool isDivisionPressed = false;
+  bool isMultiplePressed = false;
+  bool isMinusPressed = false;
+  bool isPlusPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    //
+    bool test = isDivisionPressed;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -37,6 +41,10 @@ class _MainScreenState extends State<MainScreen> {
                     action: (() {
                       setState(() {
                         output = '0';
+                        isDivisionPressed = false;
+                        isMultiplePressed = false;
+                        isMinusPressed = false;
+                        isPlusPressed = false;
                         print('AC');
                       });
                     }),
@@ -53,7 +61,10 @@ class _MainScreenState extends State<MainScreen> {
                 // % button
                 DisplayFormatButtons(action: ((() => print('%'))), text: '%'),
                 // division button
-                OperatorsButtons(action: () => operatorFunc('÷'), text: '÷'),
+                OperatorsButtons(
+                    action: () => operatorFunc('÷'),
+                    text: '÷',
+                    isPressed: isDivisionPressed),
               ],
             ),
             // Second Row
@@ -63,7 +74,10 @@ class _MainScreenState extends State<MainScreen> {
                 NumberButtons(action: () => numbersFunc('7'), text: '7'),
                 NumberButtons(action: (() => numbersFunc('8')), text: '8'),
                 NumberButtons(action: (() => numbersFunc('9')), text: '9'),
-                OperatorsButtons(action: () => operatorFunc('×'), text: '×'),
+                OperatorsButtons(
+                    action: () => operatorFunc('×'),
+                    text: '×',
+                    isPressed: isMultiplePressed),
               ],
             ),
             // Third Row
@@ -73,7 +87,10 @@ class _MainScreenState extends State<MainScreen> {
                 NumberButtons(action: () => numbersFunc('4'), text: '4'),
                 NumberButtons(action: () => numbersFunc('5'), text: '5'),
                 NumberButtons(action: () => numbersFunc('6'), text: '6'),
-                OperatorsButtons(action: () => operatorFunc('−'), text: '−'),
+                OperatorsButtons(
+                    action: () => operatorFunc('−'),
+                    text: '−',
+                    isPressed: isMinusPressed),
               ],
             ),
             // 4th Row
@@ -83,7 +100,10 @@ class _MainScreenState extends State<MainScreen> {
                 NumberButtons(action: () => numbersFunc('1'), text: '1'),
                 NumberButtons(action: () => numbersFunc('2'), text: '2'),
                 NumberButtons(action: () => numbersFunc('3'), text: '3'),
-                OperatorsButtons(action: () => operatorFunc('+'), text: '+'),
+                OperatorsButtons(
+                    action: () => operatorFunc('+'),
+                    text: '+',
+                    isPressed: isPlusPressed),
               ],
             ),
             //5th Row
@@ -92,7 +112,10 @@ class _MainScreenState extends State<MainScreen> {
               children: [
                 ZeroButton(action: () => numbersFunc('0'), text: '0'),
                 NumberButtons(action: () => floatFunc('.'), text: '.'),
-                OperatorsButtons(action: () => calculate(output), text: '='),
+                OperatorsButtons(
+                    action: () => calculate(output),
+                    text: '=',
+                    isPressed: false),
               ],
             ),
           ],
@@ -102,6 +125,10 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   numbersFunc(String num) {
+    isDivisionPressed = false;
+    isMultiplePressed = false;
+    isMinusPressed = false;
+    isPlusPressed = false;
     setState(() {
       if (output == '0') {
         output = num;
@@ -121,8 +148,34 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void operatorFunc(String op) {
-    var temp = output.substring(output.length-1);
+    var temp = output.substring(output.length - 1);
     setState(() {
+      switch (op) {
+        case '÷':
+          isDivisionPressed = true;
+          isMinusPressed = false;
+          isPlusPressed = false;
+          isMultiplePressed = false;
+          break;
+        case '×':
+          isMultiplePressed = true;
+          isDivisionPressed = false;
+          isMinusPressed = false;
+          isPlusPressed = false;
+          break;
+        case '−':
+          isMinusPressed = true;
+          isDivisionPressed = false;
+          isMultiplePressed = false;
+          isPlusPressed = false;
+          break;
+        case '+':
+          isPlusPressed = true;
+          isMinusPressed = false;
+          isDivisionPressed = false;
+          isMultiplePressed = false;
+          break;
+      }
       if (temp == '+' || temp == '−' || temp == '×' || temp == '÷') {
         output = replaceLast(output, op);
       } //
@@ -204,7 +257,10 @@ class _MainScreenState extends State<MainScreen> {
       print(output);
     } else {
       setState(() {
-        output = result.toString();
+        output = result
+            .toStringAsFixed(8)
+            .replaceAll(RegExp(r'0*$'), '')
+            .replaceAll(RegExp(r'\.$'), '');
       });
       print(output);
     }
