@@ -134,14 +134,14 @@ class _MainScreenState extends State<MainScreen> {
       //% button
       if (displayFormat == '%') {
         // Check if the string consists of digits only
-        if (RegExp(r'^\d+$').hasMatch(output)) {
+        if (RegExp(r'^\d+(\.\d+)?$').hasMatch(output)) {
           output = (double.parse(output) / 100).toString();
         }
       }
       // +/- button
       if (displayFormat == '+/-') {
         // Check if the string consists of digits only
-        if (RegExp(r'^\d+$').hasMatch(output) || output.startsWith('−')) {
+        if (RegExp(r'^\d+(\.\d+)?$').hasMatch(output) || output.startsWith('-')) {
           if (!output.startsWith('-') && output != '0') {
             output = '-' + output;
           } else if (output.startsWith('-')) {
